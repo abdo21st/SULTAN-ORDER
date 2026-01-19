@@ -65,7 +65,7 @@ export default function NewOrderPage() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
@@ -77,24 +77,24 @@ export default function NewOrderPage() {
         }
 
         try {
-            // Simulate API delay
-            setTimeout(() => {
-                orderService.create({
-                    customerName: formData.customerName,
-                    customerPhone: formData.customerPhone,
-                    description: formData.description,
-                    dueDate: formData.dueDate,
-                    totalAmount: formData.totalAmount,
-                    paidAmount: formData.paidAmount,
-                    imageUrl: imagePreview || undefined,
-                    factoryId: formData.factoryId,
-                    shopId: formData.shopId || 'unknown_shop'
-                });
-                router.push('/');
-                router.refresh();
-            }, 500);
+            await orderService.create({
+                customerName: formData.customerName,
+                customerPhone: formData.customerPhone,
+                description: formData.description,
+                dueDate: formData.dueDate,
+                totalAmount: formData.totalAmount,
+                paidAmount: formData.paidAmount,
+                imageUrl: imagePreview || undefined,
+                factoryId: formData.factoryId,
+                shopId: formData.shopId || 'unknown_shop'
+            });
+
+            router.push('/');
+            router.refresh();
         } catch (error) {
-            console.error(error);
+            console.error('Failed to create order:', error);
+            alert('حدث خطأ أثناء حفظ الطلب. يرجى المحاولة مرة أخرى.');
+        } finally {
             setLoading(false);
         }
     };

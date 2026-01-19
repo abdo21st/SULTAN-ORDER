@@ -288,8 +288,93 @@ class OrderService {
     }
 
     // --- Alerts ---
-    getAlertRules(): AlertRule[] { return []; }
-    getMyNotifications(): AppNotification[] { return []; }
+    // --- Roles (Using LocalStorage for simplicity now) ---
+    saveRole(role: Role) {
+        const index = this.roles.findIndex(r => r.id === role.id);
+        if (index >= 0) {
+            this.roles[index] = role;
+        } else {
+            this.roles.push(role);
+        }
+        this.saveData('sultan_roles_v2', this.roles);
+        this.notifyListeners();
+    }
+
+    // --- Alerts (Using LocalStorage) ---
+    private alertRules: AlertRule[] = [];
+
+    getAlertRules(): AlertRule[] { return this.alertRules; }
+
+    saveAlertRule(rule: AlertRule) {
+        const index = this.alertRules.findIndex(r => r.id === rule.id);
+        if (index >= 0) {
+            this.alertRules[index] = rule;
+        } else {
+            this.alertRules.push(rule);
+        }
+        this.saveData('sultan_alerts_v2', this.alertRules);
+        this.notifyListeners();
+    }
+
+    deleteAlertRule(id: string) {
+        this.alertRules = this.alertRules.filter(r => r.id !== id);
+        this.saveData('sultan_alerts_v2', this.alertRules);
+        this.notifyListeners();
+    }
+
+    // --- Backup & Restore ---
+    createBackup(): any {
+        return {
+            version: '2.0',
+            date: new Date().toISOString(),
+            orders: this.orders,
+            users: this.users,
+            facilities: this.facilities,
+            roles: this.roles,
+            alertRules: this.alertRules
+        };
+    }
+
+    // Note: Restore is tricky with Cloud DB. We will just restore local settings for now
+    // or warn user that cloud data needs manual update.
+    restoreBackup(data: any): boolean {
+        try {
+            if (data.users) this.users = data.users; // Note: Won't sync to cloud automatically!
+            if (data.facilities) this.facilities = data.facilities;
+            if (data.roles) this.roles = data.roles;
+            if (data.alertRules) this.alertRules = data.alertRules;
+
+            this.saveData('sultan_roles_v2', this.roles);
+            this.saveData('sultan_alerts_v2', this.alertRules);
+
+            this.notifyListeners();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Local Storage Helper
+    private saveData(key: string, data: any) {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+    }
+
+    // Load extra local settings on init
+    loadLocalSettings() {
+        if (typeof window !== 'undefined') {
+            const roles = localStorage.getItem('sultan_roles_v2');
+            if (roles) this.roles = JSON.parse(roles);
+
+            const alerts = localStorage.getItem('sultan_alerts_v2');
+            if (alerts) this.alertRules = JSON.parse(alerts);
+        }
+    }
 }
 
 export const orderService = new OrderService();
+// Init local settings
+if (typeof window !== 'undefined') {
+    orderService.loadLocalSettings();
+}

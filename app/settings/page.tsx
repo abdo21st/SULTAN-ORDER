@@ -65,11 +65,11 @@ export default function SettingsPage() {
     };
 
     // --- Users Handlers ---
-    const handleAddUser = (e: React.FormEvent) => {
+    const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newUser.username || !newUser.password || !newUser.displayName || !newUser.roleId) return;
 
-        orderService.saveUser({
+        await orderService.saveUser({
             ...newUser as User,
             id: newUser.id || Math.random().toString(36).substr(2, 9)
         });
@@ -77,19 +77,19 @@ export default function SettingsPage() {
         refreshData();
     };
 
-    const handleDeleteUser = (id: string) => {
+    const handleDeleteUser = async (id: string) => {
         if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-            orderService.deleteUser(id);
+            await orderService.deleteUser(id);
             refreshData();
         }
     };
 
     // --- Facility Handlers ---
-    const handleAddFacility = (e: React.FormEvent) => {
+    const handleAddFacility = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newFacility.name) return;
 
-        orderService.saveFacility({
+        await orderService.saveFacility({
             ...newFacility as Facility,
             id: newFacility.id || Math.random().toString(36).substr(2, 9)
         });
@@ -97,9 +97,9 @@ export default function SettingsPage() {
         refreshData();
     };
 
-    const handleDeleteFacility = (id: string) => {
+    const handleDeleteFacility = async (id: string) => {
         if (confirm('هل أنت متأكد؟ قد توجد طلبات مرتبطة بهذا الفرع/المصنع!')) {
-            orderService.deleteFacility(id);
+            await orderService.deleteFacility(id);
             refreshData();
         }
     };
