@@ -1,16 +1,28 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { FacilityType } from '@/app/types';
+import mongoose from 'mongoose';
 
-export interface IFacility extends Document {
-    name: string;
-    type: FacilityType;
-    location?: string;
-}
-
-const FacilitySchema: Schema = new Schema({
-    name: { type: String, required: true },
-    type: { type: String, required: true, enum: ['SHOP', 'FACTORY'] },
-    location: { type: String }
+const FacilitySchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please provide a name for the facility'],
+    },
+    type: {
+        type: String,
+        enum: ['SHOP', 'FACTORY'],
+        required: true,
+    },
+    location: {
+        type: String,
+    },
+}, {
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, ret) {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+        }
+    },
+    toObject: { virtuals: true }
 });
 
-export default mongoose.models.Facility || mongoose.model<IFacility>('Facility', FacilitySchema);
+export default mongoose.models.Facility || mongoose.model('Facility', FacilitySchema);

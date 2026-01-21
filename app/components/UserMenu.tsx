@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { orderService } from '@/app/lib/store';
-import { LogOut, User as UserIcon, Settings, PlusCircle, Home } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, PlusCircle, Home, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UserMenu() {
@@ -56,6 +56,9 @@ export default function UserMenu() {
                 <Link href="/settings" className="hover:text-orange-600 p-2 rounded-md hover:bg-orange-50 flex items-center gap-1" title="الإعدادات">
                     <Settings size={18} />
                 </Link>
+                <Link href="/finance" className="hover:text-green-600 p-2 rounded-md hover:bg-green-50 flex items-center gap-1" title="المالية">
+                    <DollarSign size={18} />
+                </Link>
             </div>
 
             <div className="h-6 w-px bg-gray-200 hidden md:block"></div>
@@ -87,6 +90,9 @@ export default function UserMenu() {
                             </Link>
                             <Link href="/settings" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600">
                                 <Settings size={16} /> الإعدادات
+                            </Link>
+                            <Link href="/finance" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600">
+                                <DollarSign size={16} /> المالية
                             </Link>
                         </div>
 

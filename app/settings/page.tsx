@@ -69,9 +69,9 @@ export default function SettingsPage() {
         e.preventDefault();
         if (!newUser.username || !newUser.password || !newUser.displayName || !newUser.roleId) return;
 
+        // Don't generate ID here. Let DB handle it.
         await orderService.saveUser({
-            ...newUser as User,
-            id: newUser.id || Math.random().toString(36).substr(2, 9)
+            ...newUser as User
         });
         setNewUser({});
         refreshData();
@@ -89,9 +89,9 @@ export default function SettingsPage() {
         e.preventDefault();
         if (!newFacility.name) return;
 
+        // Don't generate ID here. Let DB handle it.
         await orderService.saveFacility({
-            ...newFacility as Facility,
-            id: newFacility.id || Math.random().toString(36).substr(2, 9)
+            ...newFacility as Facility
         });
         setNewFacility({ type: 'SHOP' });
         refreshData();

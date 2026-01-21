@@ -1,19 +1,36 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from 'mongoose';
 
-export interface IUser extends Document {
-    username: string;
-    displayName: string;
-    password?: string; // Optional for external auth, but used here for simple auth
-    roleId: string;
-    facilityId?: string;
-}
-
-const UserSchema: Schema = new Schema({
-    username: { type: String, required: true, unique: true },
-    displayName: { type: String, required: true },
-    password: { type: String }, // In production, this should be HASHED
-    roleId: { type: String, required: true },
-    facilityId: { type: String }
+const UserSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: [true, 'Please provide a username'],
+        unique: true,
+    },
+    password: {
+        type: String,
+        // required: [true, 'Please provide a password'], // Optional for now
+    },
+    displayName: {
+        type: String,
+        required: [true, 'Please provide a display name'],
+    },
+    roleId: {
+        type: String,
+        required: [true, 'Please provide a role ID'],
+    },
+    facilityId: {
+        type: String,
+    },
+}, {
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, ret) {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+        }
+    },
+    toObject: { virtuals: true }
 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export default mongoose.models.User || mongoose.model('User', UserSchema);
