@@ -227,7 +227,7 @@ class OrderService {
     getShops(): Facility[] { return this.facilities.filter(f => f.type === 'SHOP'); }
     getFactories(): Facility[] { return this.facilities.filter(f => f.type === 'FACTORY'); }
 
-    async saveFacility(facility: Facility) {
+    async saveFacility(facility: Facility): Promise<boolean> {
         try {
             const method = facility.id || (facility as any)._id ? 'PUT' : 'POST';
             const url = facility.id || (facility as any)._id
@@ -243,8 +243,13 @@ class OrderService {
             if (res.ok) {
                 await this.fetchAllData();
                 this.notifyListeners();
+                return true;
             }
-        } catch (e) { console.error(e); }
+            return false;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
     }
 
     async deleteFacility(id: string) {

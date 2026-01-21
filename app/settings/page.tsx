@@ -85,16 +85,31 @@ export default function SettingsPage() {
     };
 
     // --- Facility Handlers ---
+    // --- Facility Handlers ---
     const handleAddFacility = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newFacility.name) return;
+        if (!newFacility.name) {
+            alert('يرجى كتابة اسم الفرع/المصنع');
+            return;
+        }
+
+        // Ensure type is set (default to SHOP if missing)
+        const facilityToSave = {
+            ...newFacility,
+            type: newFacility.type || 'SHOP'
+        };
 
         // Don't generate ID here. Let DB handle it.
-        await orderService.saveFacility({
-            ...newFacility as Facility
-        });
-        setNewFacility({ type: 'SHOP' });
-        refreshData();
+        const success = await orderService.saveFacility(facilityToSave as Facility);
+
+        if (success) {
+            setNewFacility({ type: 'SHOP' });
+            refreshData();
+            // Optional: Success message
+            // alert('تمت الإضافة بنجاح');
+        } else {
+            alert('فشل في حفظ البيانات. يرجى المحاولة مرة أخرى.');
+        }
     };
 
     const handleDeleteFacility = async (id: string) => {
