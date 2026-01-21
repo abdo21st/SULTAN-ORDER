@@ -35,7 +35,16 @@ class OrderService {
     }
 
     // --- API Calls (Central Data Fetcher) ---
-    async fetchAllData() {
+    private lastFetchTime: number = 0;
+    private FETCH_COOLDOWN_MS = 5000; // 5 seconds cache
+
+    async fetchAllData(force: boolean = false) {
+        // Cache check: Skip if recently fetched and not forced
+        const now = Date.now();
+        if (!force && (now - this.lastFetchTime < this.FETCH_COOLDOWN_MS)) {
+            return;
+        }
+
         try {
             // Parallel fetching for speed
             const [resOrders, resUsers, resFacilities] = await Promise.all([
@@ -52,8 +61,8 @@ class OrderService {
             if (dataUsers.success) this.users = dataUsers.data;
             if (dataFacilities.success) this.facilities = dataFacilities.data;
 
-            // Should seed defaults if DB is empty? Maybe later.
-
+            this.lastFetchTime = Date.now();
+            this.notifyListeners(); // Notify only on fresh data
         } catch (e) {
             console.error("Failed to fetch data", e);
         }
@@ -129,7 +138,7 @@ class OrderService {
     getOrders(): Order[] { return this.orders; }
 
     async refreshOrders(): Promise<Order[]> {
-        await this.fetchAllData();
+        await this.fetchAllData(true);
         this.notifyListeners();
         return this.orders;
     }
@@ -148,7 +157,7 @@ class OrderService {
             });
             const json = await res.json();
             if (json.success) {
-                await this.fetchAllData();
+                await this.fetchAllData(true);
                 this.notifyListeners();
                 return json.data;
             }
@@ -185,7 +194,7 @@ class OrderService {
             });
             const json = await res.json();
             if (json.success) {
-                await this.fetchAllData();
+                await this.fetchAllData(true);
                 this.notifyListeners();
                 return json.data;
             }
@@ -241,7 +250,7 @@ class OrderService {
             });
 
             if (res.ok) {
-                await this.fetchAllData();
+                await this.fetchAllData(true);
                 this.notifyListeners();
                 return true;
             }
@@ -255,7 +264,7 @@ class OrderService {
     async deleteFacility(id: string) {
         try {
             await fetch(`/api/facilities/${id}`, { method: 'DELETE' });
-            await this.fetchAllData();
+            await this.fetchAllData(true);
             this.notifyListeners();
         } catch (e) { console.error(e); }
     }
@@ -279,7 +288,7 @@ class OrderService {
             });
 
             if (res.ok) {
-                await this.fetchAllData();
+                await this.fetchAllData(true);
                 this.notifyListeners();
             }
         } catch (e) { console.error(e); }
@@ -288,7 +297,7 @@ class OrderService {
     async deleteUser(id: string) {
         try {
             await fetch(`/api/users/${id}`, { method: 'DELETE' });
-            await this.fetchAllData();
+            await this.fetchAllData(true);
             this.notifyListeners();
         } catch (e) { console.error(e); }
     }

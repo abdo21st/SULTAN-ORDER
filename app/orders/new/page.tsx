@@ -26,32 +26,46 @@ export default function NewOrderPage() {
     });
 
     useEffect(() => {
-        // 1. Get List of FACTORIES (Destinations)
-        const allFactories = orderService.getFactories();
-        setFactories(allFactories);
+        const initData = async () => {
+            // Ensure we have data
+            if (orderService.getFactories().length === 0) {
+                await orderService.fetchAllData();
+            }
 
-        // 2. Identify Current User's Facility (SHOP)
-        const currentUser = orderService.getCurrentUser();
-        if (currentUser && currentUser.facilityId) {
-            // Find the facility object
-            const facilities = orderService.getFacilities();
-            const userFacility = facilities.find(f => f.id === currentUser.facilityId);
+            // 1. Get List of FACTORIES
+            const allFactories = orderService.getFactories();
+            setFactories(allFactories);
 
-            if (userFacility) {
-                if (userFacility.type === 'SHOP') {
+            // 2. Identify Current User's Facility (SHOP)
+            const currentUser = orderService.getCurrentUser();
+            let myShopId = '';
+
+            if (currentUser && currentUser.facilityId) {
+                const facilities = orderService.getFacilities();
+                const userFacility = facilities.find(f => f.id === currentUser.facilityId);
+                if (userFacility) {
                     setCurrentShop(userFacility);
-                    setFormData(prev => ({ ...prev, shopId: userFacility.id }));
-                } else {
-                    // If user is form a FACTORY creating an order (rare but possible), treat it as Shop logic or just set their ID
-                    setFormData(prev => ({ ...prev, shopId: userFacility.id }));
+                    myShopId = userFacility.id;
                 }
             }
-        }
 
-        // Auto-select factory if only one exists
-        if (allFactories.length === 1) {
-            setFormData(prev => ({ ...prev, factoryId: allFactories[0].id }));
-        }
+            // Fallback: If no shop assigned to user (e.g. admin), try to pick the first SHOP available
+            if (!myShopId) {
+                const allShops = orderService.getShops();
+                if (allShops.length > 0) {
+                    myShopId = allShops[0].id;
+                    // Optional: Set visual indication that we auto-picked a shop
+                }
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                shopId: myShopId || 'unknown_shop', // Fallback to avoid validation error
+                factoryId: allFactories.length === 1 ? allFactories[0].id : prev.factoryId
+            }));
+        };
+
+        initData();
     }, []);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -8,6 +8,7 @@ export async function GET() {
         const orders = await Order.find({}).sort({ createdAt: -1 }); // Newest first
         return NextResponse.json({ success: true, data: orders });
     } catch (error) {
+        console.error("Orders GET Error:", error);
         return NextResponse.json({ success: false, error: 'Failed to fetch orders' }, { status: 500 });
     }
 }

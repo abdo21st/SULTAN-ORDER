@@ -32,6 +32,7 @@ const OrderSchema = new mongoose.Schema({
     },
     remainingAmount: {
         type: Number,
+        default: 0,
     },
     imageUrl: {
         type: String,

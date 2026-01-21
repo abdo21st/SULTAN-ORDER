@@ -8,6 +8,7 @@ export async function GET() {
         const facilities = await Facility.find({});
         return NextResponse.json({ success: true, data: facilities });
     } catch (error) {
+        console.error("Facilities GET Error:", error);
         return NextResponse.json({ success: false, error: 'Failed to fetch facilities' }, { status: 500 });
     }
 }
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
         const facility = await Facility.create(body);
         return NextResponse.json({ success: true, data: facility }, { status: 201 });
     } catch (error) {
+        console.error("Facilities POST Error:", error);
         return NextResponse.json({ success: false, error: 'Failed to create facility' }, { status: 400 });
     }
 }
