@@ -25,6 +25,7 @@ class OrderService {
     private users: User[] = [];
     private facilities: Facility[] = [];
     private roles: Role[] = DEFAULT_ROLES;
+    private notifications: AppNotification[] = [];
 
     // Auth state
     private CURRENT_USER_KEY = 'sultan_current_user_v2';
@@ -322,6 +323,49 @@ class OrderService {
         this.notifyListeners();
     }
 
+    // --- Notifications System ---
+    getMyNotifications(): AppNotification[] {
+        const user = this.getCurrentUser();
+        if (!user) return [];
+
+        return this.notifications.filter(n =>
+            (n.userId && n.userId === user.id) ||
+            (n.roleId && n.roleId === user.roleId)
+        ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
+    createNotification(notification: Partial<AppNotification>) {
+        const newNotification: AppNotification = {
+            id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            title: notification.title || 'تنيه جديد',
+            message: notification.message || '',
+            type: notification.type || 'INFO',
+            isRead: false,
+            createdAt: new Date().toISOString(),
+            targetUrl: notification.targetUrl,
+            roleId: notification.roleId,
+            userId: notification.userId
+        };
+
+        this.notifications.unshift(newNotification);
+        // Limit to last 100 notifications to prevent storage overflow
+        if (this.notifications.length > 100) {
+            this.notifications = this.notifications.slice(0, 100);
+        }
+
+        this.saveData('sultan_notifications_v2', this.notifications);
+        this.notifyListeners();
+    }
+
+    markAsRead(id: string) {
+        const notif = this.notifications.find(n => n.id === id);
+        if (notif) {
+            notif.isRead = true;
+            this.saveData('sultan_notifications_v2', this.notifications);
+            this.notifyListeners();
+        }
+    }
+
     // --- Backup & Restore ---
     createBackup(): any {
         return {
@@ -369,6 +413,9 @@ class OrderService {
 
             const alerts = localStorage.getItem('sultan_alerts_v2');
             if (alerts) this.alertRules = JSON.parse(alerts);
+
+            const notifs = localStorage.getItem('sultan_notifications_v2');
+            if (notifs) this.notifications = JSON.parse(notifs);
         }
     }
 }

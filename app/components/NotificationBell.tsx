@@ -13,7 +13,7 @@ export default function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [lastCheck, setLastCheck] = useState<number>(Date.now());
+    const [lastCheck, setLastCheck] = useState<number>(0);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
