@@ -110,8 +110,8 @@ export default function FinancePage() {
                     <button
                         onClick={() => setActiveTab('dashboard')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'dashboard'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-white text-gray-600 hover:bg-gray-50'
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         لوحة التحكم
@@ -119,8 +119,8 @@ export default function FinancePage() {
                     <button
                         onClick={() => setActiveTab('expenses')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === 'expenses'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-white text-gray-600 hover:bg-gray-50'
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         <Plus size={16} />
@@ -144,7 +144,7 @@ export default function FinancePage() {
                                 {stats?.totalRevenue?.toLocaleString()} <span className="text-sm font-sans text-gray-400">د.ل</span>
                             </div>
                             <div className="mt-2 text-xs text-emerald-600 bg-emerald-50 inline-block px-2 py-1 rounded-full">
-                                +{stats?.currentMonth.revenue.toLocaleString()} هذا الشهر
+                                +{stats?.currentMonth?.revenue?.toLocaleString() || 0} هذا الشهر
                             </div>
                         </div>
 
@@ -158,7 +158,7 @@ export default function FinancePage() {
                                 {stats?.totalExpenses?.toLocaleString()} <span className="text-sm font-sans text-gray-400">د.ل</span>
                             </div>
                             <div className="mt-2 text-xs text-red-600 bg-red-50 inline-block px-2 py-1 rounded-full">
-                                +{stats?.currentMonth.expenses.toLocaleString()} هذا الشهر
+                                +{stats?.currentMonth?.expenses?.toLocaleString() || 0} هذا الشهر
                             </div>
                         </div>
 
@@ -222,8 +222,8 @@ export default function FinancePage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-2 py-1 rounded text-xs font-medium ${tx.type === 'INCOME'
-                                                            ? 'bg-emerald-100 text-emerald-700'
-                                                            : 'bg-red-100 text-red-700'
+                                                        ? 'bg-emerald-100 text-emerald-700'
+                                                        : 'bg-red-100 text-red-700'
                                                         }`}>
                                                         {tx.type === 'INCOME' ? 'إيراد' : 'مصروف'}
                                                     </span>
