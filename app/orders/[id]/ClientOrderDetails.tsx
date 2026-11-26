@@ -71,13 +71,11 @@ export default function ClientOrderDetails({ id }: { id: string }) {
         }
     }, [order]);
 
-    const handleStatusUpdate = (nextStatus: OrderStatus) => {
+    const handleStatusUpdate = async (nextStatus: OrderStatus) => {
         if (!order) return;
 
-        console.log('Attemping to update status to:', nextStatus);
-        const updated = orderService.updateStatus(order.id, nextStatus);
+        const updated = await orderService.updateStatus(order.id, nextStatus);
         if (updated) {
-            console.log('Status updated successfully:', updated);
             setOrder(updated);
             router.refresh();
         } else {
