@@ -24,10 +24,8 @@ const UserSchema = new mongoose.Schema({
 }, {
     toJSON: {
         virtuals: true,
-        transform: function (doc, ret) {
-            ret.id = ret._id;
-            delete ret._id;
-            delete ret.__v;
+        transform: function (_doc, { _id, __v, ...fields }) {
+            return { ...fields, id: _id };
         }
     },
     toObject: { virtuals: true }

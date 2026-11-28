@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/app/lib/db';
 import Order from '@/app/models/Order';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         await dbConnect();
-        const { id } = params;
+        const { id } = await params;
         const updates = await request.json();
 
         // Always update the 'updatedAt' field
@@ -29,10 +29,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         await dbConnect();
-        const { id } = params;
+        const { id } = await params;
         const deletedOrder = await Order.findByIdAndDelete(id);
 
         if (!deletedOrder) {

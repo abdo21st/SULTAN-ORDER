@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/app/lib/db';
 import User from '@/app/models/User';
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         await dbConnect();
-        const { id } = params;
+        const { id } = await params;
         const deletedUser = await User.findByIdAndDelete(id);
 
         if (!deletedUser) {
@@ -18,10 +18,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         await dbConnect();
-        const { id } = params;
+        const { id } = await params;
         const updates = await request.json();
 
         const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
